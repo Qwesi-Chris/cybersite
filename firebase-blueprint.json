@@ -1,0 +1,29 @@
+{
+  "entities": {
+    "Progress": {
+      "title": "Progress",
+      "description": "Tracks a user's completion status for a specific tutorial section.",
+      "type": "object",
+      "properties": {
+        "completed": {
+          "type": "boolean",
+          "description": "Whether the user has completed the section."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the section was completed."
+        }
+      },
+      "required": ["completed", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/progress/{progressId}": {
+      "schema": {
+        "$ref": "#/entities/Progress"
+      },
+      "description": "Stores progress for each tutorial section per user."
+    }
+  }
+}

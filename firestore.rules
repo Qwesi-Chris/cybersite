@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the user is the owner of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Progress tracking for users
+    match /users/{userId}/progress/{progressId} {
+      // Users can only read and write their own progress
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && 
+        request.resource.data.keys().hasAll(['completed', 'timestamp']) &&
+        request.resource.data.completed is bool &&
+        request.resource.data.timestamp is timestamp;
+      allow update: if isOwner(userId) && 
+        request.resource.data.keys().hasAll(['completed', 'timestamp']) &&
+        request.resource.data.completed is bool &&
+        request.resource.data.timestamp is timestamp;
+    }
+  }
+}
